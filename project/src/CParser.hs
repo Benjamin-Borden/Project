@@ -12,7 +12,7 @@ parser' :: Parser [Stmt]
 parser' = (do res <- orParser
               token $ literal ";"
               rest <- parser'
-              return $ [res] ++ rest) <||> returnParser
+              return $ [res] ++ rest)  <||> endBlockParser
 
 keywords = ["def","return","when","if","then","else"]
 
@@ -53,7 +53,7 @@ notParser = (do token $ literal "!"
 
 
 atoms :: Parser Stmt
-atoms = ints <||> assignParser <||> varibleParser
+atoms = ints <||> assignParser <||> varibleParser <||> returnParser
 
 statements :: Parser Stmt
 statements = ifParser <||> ifElseParser <||> whileParser <||> funcParser
@@ -63,11 +63,16 @@ ints = do res <- token $ intParser
           return $ Val res
 
 
-returnParser :: Parser [Stmt]
+returnParser :: Parser Stmt
 returnParser = do token $ literal "return "
                   res <- orParser
-                  token $ literal ";"
-                  return $ [Ret res]
+                  return $ Ret res
+
+endBlockParser :: Parser [Stmt]
+endBlockParser = do res <- orParser
+                    token $ literal ";"
+                    token $ literal "}"
+                    return $ [res]
 
 ifParser :: Parser Stmt
 ifParser = do token $ literal "if"
@@ -98,10 +103,8 @@ whileParser = do token $ literal "while"
                  expr <- orParser
                  traceShowM expr
                  token $ literal ")"
-                 token $ literal "{"
-                 block <- orParser
+                 block <- blockParser
                  --traceShowM block
-                 token $ literal "}"
                  return $ While expr block
 
 -- --bleh
@@ -133,7 +136,7 @@ funcParser = do token $ literal "def"
 blockParser :: Parser Stmt
 blockParser = do token $ literal "{"
                  res <- parser'
-                 token $ literal "}"
+                 --token $ literal "}"
                  return $ Block res
 
 
