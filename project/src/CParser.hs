@@ -103,13 +103,9 @@ argSingle = do arg <- orParser
 
 
 statments :: Parser Stmt
-<<<<<<< HEAD
-statments = ifElseParser <||> ifParser <||> whileParser <||> assignParser <||> contBreakParser <||> printParser <||> line <||> returnParser
 
-=======
 statments = ifElseParser <||> ifParser <||> whileParser <||> printParser <||> contBreakParser <||>assignParser <||> line <||> returnParser
 
->>>>>>> upstream/master
 
 ifParser :: Parser Stmt
 ifParser = do token $ literal "if"
@@ -134,12 +130,8 @@ ifElseParser = do token $ literal "if"
 whileParser :: Parser Stmt
 whileParser = do token $ literal "while"
                  token $ literal "("
-<<<<<<< HEAD
-                 expr <- orParser
-=======
                  expr <- orParser
                  traceShowM expr
->>>>>>> upstream/master
                  token $ literal ")"
                  block <- blockParser
                  return $ While expr block
